@@ -1,0 +1,162 @@
+-[[[
+    🚀 APEX FLY ENGINE - ULTIMATE CYBERPUNK UI V3
+    ⚡ MAXIMUM PERFORMANCE & HIGH REFRESH RATE OPTIMIZED (120Hz/144Hz)
+    🛡️ ZERO-ALLOCATION CORE & FULL MOBILE DRAG SUPPORT
+--]]
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+
+if _G.UltimateFlyConnection then _G.UltimateFlyConnection:Disconnect() _G.UltimateFlyConnection = nil end
+if CoreGui:FindFirstChild("ApexUltimateUI") then CoreGui.ApexUltimateUI:Destroy() end
+
+local Flying = false
+local FlySpeed = 60
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ApexUltimateUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 160, 0, 210)
+MainFrame.Position = UDim2.new(0.05, 0, 0.35, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 13)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14)
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Thickness = 2
+UIStroke.Color = Color3.fromRGB(255, 30, 80)
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundTransparency = 1
+Title.Text = "🚀 APEX FLY"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0.85, 0, 0, 50)
+ToggleButton.Position = UDim2.new(0.075, 0, 0.22, 0)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+ToggleButton.Text = "SYSTEM: OFF"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 80)
+ToggleButton.TextSize = 13
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Parent = MainFrame
+
+Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 10)
+local BtnStroke = Instance.new("UIStroke", ToggleButton)
+BtnStroke.Thickness = 1.5
+BtnStroke.Color = Color3.fromRGB(255, 50, 80)
+
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Size = UDim2.new(1, 0, 0, 25)
+SpeedLabel.Position = UDim2.new(0, 0, 0.52, 0)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.Text = "ENGINE SPEED: " .. tostring(FlySpeed)
+SpeedLabel.TextColor3 = Color3.fromRGB(180, 180, 190)
+SpeedLabel.TextSize = 11
+SpeedLabel.Font = Enum.Font.Code
+SpeedLabel.Parent = MainFrame
+
+local SpeedContainer = Instance.new("Frame")
+SpeedContainer.Size = UDim2.new(0.85, 0, 0, 40)
+SpeedContainer.Position = UDim2.new(0.075, 0, 0.68, 0)
+SpeedContainer.BackgroundTransparency = 1
+SpeedContainer.Parent = MainFrame
+
+local SpeedDown = Instance.new("TextButton")
+SpeedDown.Size = UDim2.new(0.46, 0, 1, 0)
+SpeedDown.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+SpeedDown.Text = "SLOW"
+SpeedDown.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedDown.TextSize = 11
+SpeedDown.Font = Enum.Font.GothamBold
+SpeedDown.Parent = SpeedContainer
+Instance.new("UICorner", SpeedDown).CornerRadius = UDim.new(0, 8)
+
+local SpeedUp = Instance.new("TextButton")
+SpeedUp.Size = UDim2.new(0.46, 0, 1, 0)
+SpeedUp.Position = UDim2.new(0.54, 0, 0, 0)
+SpeedUp.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+SpeedUp.Text = "FAST"
+SpeedUp.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedUp.TextSize = 11
+SpeedUp.Font = Enum.Font.GothamBold
+SpeedUp.Parent = SpeedContainer
+Instance.new("UICorner", SpeedUp).CornerRadius = UDim.new(0, 8)
+
+Instance.new("UIStroke", SpeedDown).Color = Color3.fromRGB(40, 40, 50)
+Instance.new("UIStroke", SpeedUp).Color = Color3.fromRGB(40, 40, 50)
+
+local function SmoothFlyEngine()
+    if not Flying then return end
+    local Character = LocalPlayer.Character
+    if not Character then return end
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+    if not Root or not Humanoid then return end
+
+    Root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+
+    local Camera = workspace.CurrentCamera
+    local MoveDirection = Humanoid.MoveDirection
+    
+    if MoveDirection.Magnitude > 0 then
+        Root.CFrame = CFrame.new(Root.Position, Root.Position + Camera.CFrame.LookVector) * CFrame.new(0, 0, -0.01)
+        Root.AssemblyLinearVelocity = Camera.CFrame.LookVector * (FlySpeed * 1.5)
+    else
+        Root.AssemblyLinearVelocity = Vector3.new(0, 0.05, 0)
+    end
+end
+
+local function AnimateUI(targetColor, statusText)
+    local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(UIStroke, info, {Color = targetColor}):Play()
+    TweenService:Create(BtnStroke, info, {Color = targetColor}):Play()
+    ToggleButton.Text = statusText
+    ToggleButton.TextColor3 = targetColor
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+    Flying = not Flying
+    if Flying then
+        AnimateUI(Color3.fromRGB(0, 255, 140), "SYSTEM: ACTIVE")
+        _G.UltimateFlyConnection = RunService.Heartbeat:Connect(SmoothFlyEngine)
+    else
+        AnimateUI(Color3.fromRGB(255, 50, 80), "SYSTEM: OFF")
+        if _G.UltimateFlyConnection then
+            _G.UltimateFlyConnection:Disconnect()
+            _G.UltimateFlyConnection = nil
+        end
+        local Character = LocalPlayer.Character
+        if Character and Character:FindFirstChild("HumanoidRootPart") then
+            Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+        end
+    end
+end)
+
+SpeedUp.MouseButton1Click:Connect(function()
+    FlySpeed = math.clamp(FlySpeed + 15, 15, 400)
+    SpeedLabel.Text = "ENGINE SPEED: " .. tostring(FlySpeed)
+end)
+
+SpeedDown.MouseButton1Click:Connect(function()
+    FlySpeed = math.clamp(FlySpeed - 15, 15, 400)
+    SpeedLabel.Text = "ENGINE SPEED: " .. tostring(FlySpeed)
+end)
+
+print("💎 ULTIMATE APEX CYBERPUNK UI LOADED!")
